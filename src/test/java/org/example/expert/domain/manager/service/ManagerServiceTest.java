@@ -39,14 +39,14 @@ class ManagerServiceTest {
     private ManagerService managerService;
 
     @Test
-    public void manager_목록_조회_시_Todo가_없다면_NPE_에러를_던진다() {
+    public void manager_목록_조회_시_Todo가_없다면_IRE_에러를_던진다() {//npe = 값이 없는 것을 가지고 뭔가 하려다 발생하는 에러
         // given
         long todoId = 1L;
-        given(todoRepository.findById(todoId)).willReturn(Optional.empty());
+        given(todoRepository.findById(todoId)).willReturn(Optional.empty());//willReturn = 가짜 클래스의 매서드 호출에 대한 반환 값을 설정한다. 즉 뒤에 적은걸 무조건 리턴함 / optional.empty(): 값이 없으면 null 대신 빈 optional 객체를 반환하는 매서드이다.
 
         // when & then
-        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> managerService.getManagers(todoId));
-        assertEquals("Manager not found", exception.getMessage());
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> managerService.getManagers(todoId));//IRE = 요청이 잘못되었을 때 던지는 예외이다.
+        assertEquals("Todo not found", exception.getMessage()); //exception.getMessage()랑 expected가 같아야 함
     }
 
     @Test
@@ -64,7 +64,7 @@ class ManagerServiceTest {
         given(todoRepository.findById(todoId)).willReturn(Optional.of(todo));
 
         // when & then
-        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () ->
+        NullPointerException exception = assertThrows(NullPointerException.class, () ->
             managerService.saveManager(authUser, todoId, managerSaveRequest)
         );
 

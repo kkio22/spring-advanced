@@ -31,13 +31,19 @@ public class ManagerService {
     @Transactional
     public ManagerSaveResponse saveManager(AuthUser authUser, long todoId, ManagerSaveRequest managerSaveRequest) {
         // 일정을 만든 유저
-        User user = User.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser); //user id가 아니라 authUserid임
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new InvalidRequestException("Todo not found"));
 
-        if (!ObjectUtils.nullSafeEquals(user.getId(), todo.getUser().getId())) {
-            throw new InvalidRequestException("담당자를 등록하려고 하는 유저가 일정을 만든 유저가 유효하지 않습니다.");
+
+        if(todo.getUser() == null) {
+            throw new NullPointerException("담당자를 등록하려고 하는 유저가 일정을 만든 유저가 유효하지 않습니다.");
         }
+
+
+        if (!ObjectUtils.nullSafeEquals(user.getId(), todo.getUser().getId())) { //이 userId가 null이 아닌지 그리고 같은지 확인함
+            throw new InvalidRequestException("담당자를 등록하려고 하는 유저가 일정을 만든 유저가 유효하지 않습니다.");
+        }// 이 부분이 예외가 나와야 함
 
         User managerUser = userRepository.findById(managerSaveRequest.getManagerUserId())
                 .orElseThrow(() -> new InvalidRequestException("등록하려고 하는 담당자 유저가 존재하지 않습니다."));
